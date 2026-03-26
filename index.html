@@ -161,6 +161,7 @@ select option{background:#1e293b}
   </div>
   <div class="tabs">
     <div class="tab active" onclick="switchTab('predict',this)">🎯 Predict</div>
+    <div class="tab" onclick="switchTab('ipl',this)">🏆 IPL M1</div>
     <div class="tab" onclick="switchTab('backtest',this)">📊 Backtest</div>
     <div class="tab" onclick="switchTab('scorer',this)">🧮 Scorer</div>
     <div class="tab" onclick="switchTab('arch',this)">🏗 Architecture</div>
@@ -414,6 +415,113 @@ select option{background:#1e293b}
   <div class="card spacer">
     <div class="card-title">Dream11 Scoring Rules Reference</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px" id="rulesGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ IPL MATCH 1 TAB ══════════════════════ -->
+<div id="tab-ipl" style="display:none">
+
+  <!-- Match Banner -->
+  <div class="card" style="background:linear-gradient(135deg,rgba(204,0,0,0.12),rgba(255,102,0,0.08));border-color:rgba(204,0,0,0.35);margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#ef4444;margin-bottom:6px">🏆 TATA IPL 2026 · Match 1 of 84</div>
+        <div style="font-size:24px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px">
+          <span style="color:#ef4444">RCB</span>
+          <span style="color:#475569;font-size:18px;margin:0 10px">vs</span>
+          <span style="color:#ff6600">SRH</span>
+        </div>
+        <div style="font-size:13px;color:#64748b">Royal Challengers Bengaluru vs Sunrisers Hyderabad</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;font-weight:700;color:#e2e8f0">📅 Saturday, 28 March 2026</div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px">🕖 7:30 PM IST</div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px">🏟 M. Chinnaswamy Stadium, Bengaluru</div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px">📺 Star Sports / JioHotstar</div>
+      </div>
+    </div>
+    <!-- Key facts strip -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07)">
+      <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:#10b981">🏅 RCB — Defending Champions</div>
+      <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:#3b82f6">🎯 Format: T20 + Impact Player Rule</div>
+      <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:#f59e0b">⚾ Pitch: Batting Friendly (Chinnaswamy)</div>
+      <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:#ef4444">🚑 Both Aus Pacers Absent (Hazlewood & Cummins)</div>
+    </div>
+  </div>
+
+  <!-- Captains & Injury news -->
+  <div class="grid2" style="margin-bottom:16px">
+    <div class="card" style="border-color:rgba(204,0,0,0.3);background:rgba(204,0,0,0.05)">
+      <div class="card-title" style="color:#ef4444">🔴 RCB — Captaincy & Squad News</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(204,0,0,0.2);display:flex;align-items:center;justify-content:center;font-size:18px">👑</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#e2e8f0">Rajat Patidar</div>
+          <div style="font-size:11px;color:#64748b">Captain · Led RCB to maiden IPL title in 2025</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#64748b;line-height:1.7">
+        Head coach: <span style="color:#e2e8f0;font-weight:600">Andy Flower</span><br>
+        Retained 17 players · Targeted mini-auction additions<br>
+        <span style="color:#ef4444;font-weight:600">🚑 OUT: Josh Hazlewood</span> (hamstring/Achilles — first 2 games)<br>
+        <span style="color:#ef4444;font-weight:600">🚑 OUT: Yash Dayal</span> (entire season — confirmed by Dir. Cricket)
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(255,102,0,0.3);background:rgba(255,102,0,0.05)">
+      <div class="card-title" style="color:#ff6600">🟠 SRH — Captaincy & Squad News</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,102,0,0.2);display:flex;align-items:center;justify-content:center;font-size:18px">🧤</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#e2e8f0">Ishan Kishan <span style="font-size:11px;color:#64748b">(stand-in)</span></div>
+          <div style="font-size:11px;color:#64748b">Regular Captain: Pat Cummins (injured)</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#64748b;line-height:1.7">
+        VC: <span style="color:#e2e8f0;font-weight:600">Abhishek Sharma</span> (World No.1 T20I batter)<br>
+        Finished 7th in 2025 · Looking to rebuild<br>
+        <span style="color:#ef4444;font-weight:600">🚑 OUT: Pat Cummins</span> (lumbar bone stress injury)<br>
+        <span style="color:#ef4444;font-weight:600">🚑 OUT: Jack Edwards</span> (ruled out entire season)
+      </div>
+    </div>
+  </div>
+
+  <!-- Squads side by side -->
+  <div class="grid2" style="margin-bottom:16px">
+
+    <!-- RCB Predicted XI -->
+    <div class="card" style="border-color:rgba(204,0,0,0.25)">
+      <div class="card-title" style="color:#ef4444">🔴 RCB — Predicted Playing XI</div>
+      <div id="rcbSquad"></div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07)">
+        <div style="font-size:11px;color:#64748b;margin-bottom:4px">IMPACT SUBS</div>
+        <div style="font-size:12px;color:#f59e0b;font-weight:600">Venkatesh Iyer · Mangesh Yadav</div>
+      </div>
+    </div>
+
+    <!-- SRH Predicted XI -->
+    <div class="card" style="border-color:rgba(255,102,0,0.25)">
+      <div class="card-title" style="color:#ff6600">🟠 SRH — Predicted Playing XI</div>
+      <div id="srhSquad"></div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.07)">
+        <div style="font-size:11px;color:#64748b;margin-bottom:4px">IMPACT SUBS</div>
+        <div style="font-size:12px;color:#f59e0b;font-weight:600">Brydon Carse · Zeeshan Ansari</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Battles -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">⚔️ Key Battles</div>
+    <div style="display:flex;flex-direction:column;gap:10px" id="keyBattles"></div>
+  </div>
+
+  <!-- Quick Fill IPL button -->
+  <div class="card" style="background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.25)">
+    <div class="card-title" style="color:#10b981">🚀 Use This Match in Prediction Engine</div>
+    <p style="font-size:13px;color:#64748b;margin-bottom:14px">Load the RCB vs SRH squads directly into the Predict tab for Dream11 simulation.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="loadIPLMatch()">⚡ Load RCB vs SRH into Predict Tab</button>
+    </div>
   </div>
 </div>
 
@@ -1186,11 +1294,125 @@ function renderRules(){
 // ══════════════════════════════════ TAB SWITCHER ════════════════════════════
 
 function switchTab(name, el){
-  ["predict","backtest","scorer","arch"].forEach(t=>document.getElementById("tab-"+t).style.display="none");
+  ["predict","ipl","backtest","scorer","arch"].forEach(t=>document.getElementById("tab-"+t).style.display="none");
   document.getElementById("tab-"+name).style.display="block";
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   el.classList.add("active");
 }
+
+// ══════════════════════════════════ IPL MATCH 1 DATA ════════════════════════
+
+const IPL_MATCH1 = {
+  rcb: [
+    {no:1, name:"Virat Kohli",        role:"bat",      label:"Opener · IPL All-time Top Scorer",        color:"#3b82f6"},
+    {no:2, name:"Phil Salt",           role:"bat",      label:"Opener · Power-play specialist",           color:"#3b82f6"},
+    {no:3, name:"Devdutt Padikkal",    role:"bat",      label:"No.3 · Left-hand anchor",                  color:"#3b82f6"},
+    {no:4, name:"Rajat Patidar",       role:"bat",      label:"Captain · IPL 2025 title-winning skipper",color:"#f59e0b", captain:true},
+    {no:5, name:"Jitesh Sharma",       role:"wk",       label:"Wicket-Keeper · Lower-order hitter",       color:"#10b981"},
+    {no:6, name:"Tim David",           role:"bat",      label:"Finisher · SR 170–180 powerhouse",         color:"#3b82f6"},
+    {no:7, name:"Krunal Pandya",       role:"allround", label:"All-rounder · Left-arm seam + bat",        color:"#a855f7"},
+    {no:8, name:"Romario Shepherd",    role:"allround", label:"All-rounder · Explosive finisher",         color:"#a855f7"},
+    {no:9, name:"Suyash Sharma",       role:"bowl",     label:"Leg-spin · Key vs left-handers",           color:"#ef4444"},
+    {no:10,name:"Bhuvneshwar Kumar",   role:"bowl",     label:"Pace · Swing in powerplay · Hazlewood stand-in leader", color:"#ef4444"},
+    {no:11,name:"Jacob Duffy",         role:"bowl",     label:"Pace · NZ · Hazlewood replacement (₹2cr)", color:"#ef4444", note:"Replaces Hazlewood"},
+  ],
+  srh: [
+    {no:1, name:"Abhishek Sharma",     role:"allround", label:"Opener · Vice-Captain · World No.1 T20I batter", color:"#a855f7", vc:true},
+    {no:2, name:"Travis Head",         role:"bat",      label:"Opener · Most destructive T20 batter",     color:"#3b82f6"},
+    {no:3, name:"Ishan Kishan",        role:"wk",       label:"Stand-in Captain · WK · No.3 · IPL 2025 century on debut", color:"#f59e0b", captain:true},
+    {no:4, name:"Nitish Kumar Reddy",  role:"allround", label:"All-rounder · Pace + middle order bat",    color:"#a855f7"},
+    {no:5, name:"Heinrich Klaasen",    role:"bat",      label:"Finisher · Retained ₹23cr · Most feared finisher", color:"#3b82f6"},
+    {no:6, name:"Liam Livingstone",    role:"allround", label:"All-rounder · Signed ₹13cr · Spin + big hits", color:"#a855f7"},
+    {no:7, name:"Aniket Verma",        role:"bat",      label:"Lower-order bat",                          color:"#3b82f6"},
+    {no:8, name:"Kamindu Mendis",      role:"allround", label:"Spin all-rounder · Versatile option",      color:"#a855f7"},
+    {no:9, name:"Shivam Mavi",         role:"bowl",     label:"Pace · New ball · Cummins replacement",    color:"#ef4444"},
+    {no:10,name:"Harshal Patel",       role:"bowl",     label:"Pace · Death specialist · Ex-RCB",         color:"#ef4444"},
+    {no:11,name:"Harsh Dubey",         role:"bowl",     label:"Off-spin · Economy bowler",                color:"#ef4444"},
+  ],
+  battles:[
+    {p1:"Virat Kohli (RCB)",    p2:"Shivam Mavi (SRH)",    desc:"Kohli's aggressive powerplay vs SRH's new-ball spearhead in Cummins' absence"},
+    {p1:"Jacob Duffy (RCB)",    p2:"Travis Head (SRH)",    desc:"Hazlewood's stand-in vs the world's most destructive T20 opener — defining duel"},
+    {p1:"Suyash Sharma (RCB)",  p2:"Abhishek Sharma (SRH)",desc:"Leg-spin vs World No.1 left-hander — could be the wicket of the match"},
+    {p1:"Harshal Patel (SRH)",  p2:"Tim David (RCB)",      desc:"Death specialist vs RCB's premier finisher at SR 170+"},
+  ]
+};
+
+function renderIPLSquad(squad, containerId, teamColor){
+  const roleIcon = {bat:"🏏",bowl:"⚡",allround:"🔄",wk:"🧤"};
+  const roleBg   = {bat:"rgba(59,130,246,0.1)",bowl:"rgba(239,68,68,0.1)",allround:"rgba(168,85,247,0.1)",wk:"rgba(16,185,129,0.1)"};
+  document.getElementById(containerId).innerHTML = squad.map(p=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div style="width:22px;text-align:center;font-size:12px;color:#334155;font-weight:700">${p.no}</div>
+      <div style="width:28px;height:28px;border-radius:8px;background:${roleBg[p.role]};display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${roleIcon[p.role]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:#e2e8f0;display:flex;align-items:center;gap:5px">
+          ${p.name}
+          ${p.captain?'<span style="background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);border-radius:5px;padding:1px 5px;font-size:10px;font-weight:700">C</span>':""}
+          ${p.vc?'<span style="background:rgba(168,85,247,0.2);color:#a855f7;border:1px solid rgba(168,85,247,0.4);border-radius:5px;padding:1px 5px;font-size:10px;font-weight:700">VC</span>':""}
+          ${p.note?`<span style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:5px;padding:1px 5px;font-size:10px;font-weight:700">SUB-IN</span>`:""}
+        </div>
+        <div style="font-size:11px;color:#475569;margin-top:1px">${p.label}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderKeyBattles(){
+  document.getElementById("keyBattles").innerHTML = IPL_MATCH1.battles.map((b,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:700;color:#ef4444;flex:1;min-width:120px">${b.p1}</span>
+      <span style="font-size:12px;font-weight:800;color:#475569">⚔️</span>
+      <span style="font-size:12px;font-weight:700;color:#ff6600;flex:1;min-width:120px">${b.p2}</span>
+      <span style="font-size:12px;color:#64748b;width:100%;padding-top:4px">${b.desc}</span>
+    </div>
+  `).join("");
+}
+
+function loadIPLMatch(){
+  // Populate PLAYER_DB with IPL squads
+  PLAYER_DB["RCB"] = {};
+  IPL_MATCH1.rcb.forEach(p=>{
+    PLAYER_DB["RCB"][p.name] = {role:p.role,order:p.no,avg:p.role==="bat"?38:p.role==="wk"?30:p.role==="allround"?25:5,sr:p.role==="bat"?140:130,form:35,wpm:p.role==="bowl"?1.2:p.role==="allround"?0.8:0,eco:p.role==="bowl"?8.0:p.role==="allround"?9.0:0,ovr:p.role==="bowl"?3.5:p.role==="allround"?2.0:0,btype:"pace"};
+  });
+  PLAYER_DB["SRH"] = {};
+  IPL_MATCH1.srh.forEach(p=>{
+    PLAYER_DB["SRH"][p.name] = {role:p.role,order:p.no,avg:p.role==="bat"?38:p.role==="wk"?32:p.role==="allround"?28:5,sr:p.role==="bat"?145:135,form:38,wpm:p.role==="bowl"?1.3:p.role==="allround"?0.9:0,eco:p.role==="bowl"?8.2:p.role==="allround"?9.0:0,ovr:p.role==="bowl"?3.5:p.role==="allround"?2.0:0,btype:"pace"};
+  });
+
+  // Add quick-fill buttons if not already present
+  ["RCB","SRH"].forEach(team=>{
+    if(!document.getElementById("qf_"+team)){
+      const q = document.getElementById("quickFillBtns");
+      const btn = document.createElement("button");
+      btn.id = "qf_"+team;
+      btn.className = "btn btn-sm btn-ghost";
+      btn.style.cssText = team==="RCB"?"border:1px solid rgba(204,0,0,0.5);color:#ef4444":"border:1px solid rgba(255,102,0,0.5);color:#ff6600";
+      btn.textContent = (team==="RCB"?"🔴 ":"🟠 ")+team+" XI";
+      btn.onclick = ()=>quickFill(team);
+      q.appendChild(btn);
+    }
+  });
+
+  // Set match config
+  document.getElementById("teamA").innerHTML='<option>RCB</option><option>SRH</option><option>India</option><option>Australia</option>';
+  document.getElementById("teamB").innerHTML='<option>SRH</option><option>RCB</option><option>India</option><option>Australia</option>';
+  document.getElementById("venue").value="Chinnaswamy Stadium";
+  document.getElementById("pitchType").value="batting_friendly";
+  syncBatFirst();
+
+  // Switch to predict tab
+  const tab = [...document.querySelectorAll(".tab")].find(t=>t.textContent.includes("Predict"));
+  switchTab("predict", tab);
+
+  alert("✅ RCB & SRH squads loaded!\n\nNow click '🔴 RCB XI' or '🟠 SRH XI' in the Playing XI Builder to auto-fill players, then hit 🚀 Run Prediction Engine.");
+}
+
+// Auto-render IPL squads on load
+(function initIPL(){
+  renderIPLSquad(IPL_MATCH1.rcb,"rcbSquad","#ef4444");
+  renderIPLSquad(IPL_MATCH1.srh,"srhSquad","#ff6600");
+  renderKeyBattles();
+})();
 </script>
 </body>
 </html>
