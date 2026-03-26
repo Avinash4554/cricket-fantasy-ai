@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cricket Fantasy AI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:#060d1a;
+  color:#e2e8f0;
+  min-height:100vh;
+}
+:root{
+  --accent:#10b981;
+  --accent2:#3b82f6;
+  --gold:#f59e0b;
+  --violet:#a855f7;
+  --red:#ef4444;
+  --card-bg:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.09);
+}
+.app{max-width:1100px;margin:0 auto;padding:0 16px 60px}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{font-size:28px}
+.logo-text{font-size:18px;font-weight:800;letter-spacing:-.5px}
+.logo-text span{color:var(--accent)}
+.logo-sub{font-size:11px;color:#64748b;margin-top:2px}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.05);border-radius:12px;padding:4px}
+.tab{padding:7px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#64748b;transition:all .2s}
+.tab.active{background:var(--accent2);color:#fff}
+
+/* CARDS */
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:20px}
+.card-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#475569;margin-bottom:16px}
+
+/* GRID */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:680px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+/* INPUTS */
+label{display:block;font-size:11px;color:#64748b;margin-bottom:5px;font-weight:500}
+select,input[type=number],input[type=text]{
+  width:100%;background:rgba(255,255,255,.07);border:1px solid var(--border);
+  border-radius:9px;padding:9px 12px;color:#e2e8f0;font-size:13px;
+  outline:none;transition:border-color .2s;appearance:none;
+}
+select:focus,input:focus{border-color:var(--accent2)}
+select option{background:#1e293b}
+
+/* SCENARIO CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all .2s}
+
+/* PLAYER TAGS */
+.player-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;min-height:36px}
+.ptag{display:flex;align-items:center;gap:5px;padding:5px 10px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;font-size:12px}
+.ptag .role-icon{font-size:14px}
+.ptag .del{color:#ef444466;cursor:pointer;font-size:16px;line-height:1;margin-left:2px}
+.ptag .del:hover{color:#ef4444}
+
+/* BUTTONS */
+.btn{padding:10px 22px;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;letter-spacing:.01em}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-sm{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn-ghost{background:rgba(255,255,255,.07);color:#94a3b8}
+.btn-ghost:hover{background:rgba(255,255,255,.12)}
+.btn-danger{background:rgba(239,68,68,.15);color:#ef4444}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:680px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.stat-card.gold{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.06)}
+.stat-card.violet{border-color:rgba(168,85,247,.35);background:rgba(168,85,247,.06)}
+.stat-label{font-size:11px;color:#64748b;margin-bottom:4px}
+.stat-val{font-size:18px;font-weight:800}
+
+/* RESULTS TABLE */
+.results-table{width:100%;border-collapse:collapse;font-size:13px}
+.results-table th{text-align:left;padding:10px 12px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569;border-bottom:1px solid var(--border)}
+.results-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.results-table tr:hover td{background:rgba(255,255,255,.03)}
+.results-table tr.is-captain td{background:rgba(245,158,11,.06)}
+.results-table tr.is-vc td{background:rgba(168,85,247,.06)}
+.results-table tr.expand-row td{background:rgba(255,255,255,.02);cursor:default}
+
+/* MINI BAR */
+.minibar{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
+.bar-track{height:4px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;display:inline-block;vertical-align:middle}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid transparent}
+
+/* SCENARIO DETAIL */
+.sc-grid{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 8px}
+.sc-box{border-radius:10px;padding:10px 12px;min-width:130px;font-size:12px}
+.sc-name{font-weight:700;margin-bottom:4px;font-size:11px}
+.sc-row{color:rgba(255,255,255,.6);margin:1px 0}
+.sc-row b{color:#e2e8f0}
+
+/* PROGRESS RING */
+.ring{display:inline-flex;align-items:center;justify-content:center;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring-label{position:absolute;font-size:10px;font-weight:700}
+
+/* CHART */
+.chart-wrap{position:relative;height:260px;margin-top:8px}
+
+/* ALERT */
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px}
+.alert-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.alert-info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:#93c5fd}
+
+/* SPINNER */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SECTION SPACER */
+.spacer{margin-top:20px}
+
+/* BACKTEST */
+.bt-table{width:100%;border-collapse:collapse;font-size:13px}
+.bt-table th{padding:10px 14px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#475569;text-align:left;border-bottom:1px solid var(--border)}
+.bt-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04)}
+.progressbar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;display:inline-block;vertical-align:middle;width:80px}
+.progressbar-fill{height:100%;border-radius:3px}
+
+/* ARCH DIAGRAM */
+.arch{display:flex;flex-direction:column;gap:12px;padding:4px}
+.arch-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.arch-box{padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;border:1px solid}
+.arch-arrow{color:#475569;font-size:16px}
+
+.sep{height:1px;background:var(--border);margin:24px 0}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-icon">🏏</div>
+    <div>
+      <div class="logo-text">Cricket Fantasy <span>AI</span></div>
+      <div class="logo-sub">ML + Monte Carlo Simulation Engine</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('predict',this)">🎯 Predict</div>
+    <div class="tab" onclick="switchTab('backtest',this)">📊 Backtest</div>
+    <div class="tab" onclick="switchTab('scorer',this)">🧮 Scorer</div>
+    <div class="tab" onclick="switchTab('arch',this)">🏗 Architecture</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ PREDICT TAB ══════════════════════════ -->
+<div id="tab-predict">
+
+  <!-- Match Config -->
+  <div class="card">
+    <div class="card-title">Match Configuration</div>
+    <div class="grid4" style="margin-bottom:14px">
+      <div><label>Team A</label>
+        <select id="teamA" onchange="syncBatFirst()">
+          <option>India</option><option>Australia</option><option>England</option><option>Pakistan</option>
+        </select>
+      </div>
+      <div><label>Team B</label>
+        <select id="teamB" onchange="syncBatFirst()">
+          <option>Australia</option><option>India</option><option>England</option><option>Pakistan</option>
+        </select>
+      </div>
+      <div><label>Batting First</label>
+        <select id="battingFirst">
+          <option>India</option><option>Australia</option>
+        </select>
+      </div>
+      <div><label>Venue</label>
+        <select id="venue">
+          <option>Wankhede Stadium</option>
+          <option>Eden Gardens</option>
+          <option>Chinnaswamy Stadium</option>
+          <option>MA Chidambaram Stadium</option>
+          <option>Narendra Modi Stadium</option>
+          <option>MCG</option>
+          <option>Lords</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid4">
+      <div><label>Pitch Type</label>
+        <select id="pitchType">
+          <option value="balanced">Balanced</option>
+          <option value="batting_friendly">Batting Friendly</option>
+          <option value="spin_friendly">Spin Friendly</option>
+          <option value="pace_friendly">Pace Friendly</option>
+        </select>
+      </div>
+      <div><label>Weather</label>
+        <select id="weather">
+          <option value="normal">Normal</option>
+          <option value="dew">Dew (favours chase)</option>
+          <option value="rain_interrupted">Rain Interrupted</option>
+        </select>
+      </div>
+      <div><label>Simulations</label>
+        <select id="nSim">
+          <option value="200">200 (fast)</option>
+          <option value="500" selected>500</option>
+          <option value="1000">1000 (accurate)</option>
+        </select>
+      </div>
+    </div>
+    <!-- Scenarios -->
+    <div style="margin-top:14px">
+      <label>Active Scenarios <span style="color:#475569;font-weight:400">(all = empty selection)</span></label>
+      <div class="chips" id="scenarioChips"></div>
+    </div>
+  </div>
+
+  <!-- Players -->
+  <div class="card spacer">
+    <div class="card-title">Playing XI Builder <span id="playerCount" style="color:#475569;font-weight:400;text-transform:none;font-size:12px"></span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px" id="quickFillBtns"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end">
+      <div><label>Name</label><input type="text" id="addName" placeholder="e.g. Virat Kohli" style="width:160px" /></div>
+      <div><label>Team</label>
+        <select id="addTeam" style="width:120px">
+          <option>India</option><option>Australia</option><option>England</option><option>Pakistan</option>
+        </select>
+      </div>
+      <div><label>Role</label>
+        <select id="addRole" style="width:110px">
+          <option value="bat">🏏 Bat</option>
+          <option value="bowl">⚡ Bowl</option>
+          <option value="allround">🔄 All-round</option>
+          <option value="wk">🧤 WK</option>
+        </select>
+      </div>
+      <div><label>Order</label><input type="number" id="addOrder" min="1" max="11" value="1" style="width:64px" /></div>
+      <button class="btn btn-primary" style="padding:9px 18px;font-size:13px" onclick="addPlayer()">+ Add</button>
+      <button class="btn btn-sm btn-danger" onclick="clearPlayers()">Clear All</button>
+    </div>
+    <div class="player-tags" id="playerTags"><span style="color:#475569;font-size:12px">No players added yet</span></div>
+  </div>
+
+  <!-- Run -->
+  <div style="display:flex;align-items:center;gap:14px;margin-top:18px">
+    <button class="btn btn-primary" style="font-size:15px;padding:12px 28px" id="runBtn" onclick="runPrediction()">
+      🚀 Run Prediction Engine
+    </button>
+    <span id="runStatus" style="font-size:13px;color:#64748b"></span>
+  </div>
+  <div id="errorBox" style="display:none" class="alert alert-error spacer"></div>
+
+  <!-- RESULTS (hidden initially) -->
+  <div id="results" style="display:none" class="spacer">
+
+    <!-- Summary stat cards -->
+    <div class="stat-grid" id="statCards"></div>
+
+    <!-- Captain banner -->
+    <div id="captainBanner" class="card" style="display:flex;gap:24px;flex-wrap:wrap;padding:16px 20px;margin-bottom:18px"></div>
+
+    <!-- Table -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table class="results-table" id="resultsTable">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Predicted Pts</th>
+              <th>Max</th>
+              <th>Min</th>
+              <th>Risk</th>
+              <th>Confidence</th>
+              <th>Consistency</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Charts side by side -->
+    <div class="grid2 spacer">
+      <div class="card">
+        <div class="card-title">Points Distribution</div>
+        <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Scenario Comparison — Top 5</div>
+        <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+      </div>
+    </div>
+
+    <p style="text-align:center;color:#334155;font-size:12px;margin-top:10px">
+      Click any row to expand scenario breakdown · Powered by in-browser Monte Carlo simulation
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ BACKTEST TAB ════════════════════════ -->
+<div id="tab-backtest" style="display:none">
+  <div class="card">
+    <div class="card-title">Self-Learning Backtesting Engine</div>
+    <p style="color:#64748b;font-size:13px;margin-bottom:16px">
+      Simulates historical match predictions, compares against synthetic actual points, calculates MAE/RMSE, and adjusts per-player weight multipliers for future predictions.
+    </p>
+    <button class="btn btn-primary" id="btBtn" onclick="runBacktest()">▶ Run Backtest (5 sample matches)</button>
+  </div>
+
+  <div id="btResults" style="display:none;margin-top:20px">
+    <div class="stat-grid" id="btStats"></div>
+    <div class="card" style="padding:0;overflow:hidden;margin-top:4px">
+      <div style="overflow-x:auto">
+        <table class="bt-table">
+          <thead><tr><th>Match</th><th>MAE</th><th>RMSE</th><th>Top-5 Accuracy</th><th>Verdict</th></tr></thead>
+          <tbody id="btBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card spacer">
+      <div class="card-title">Learned Player Weight Corrections</div>
+      <div id="weightGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:4px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SCORER TAB ══════════════════════════ -->
+<div id="tab-scorer" style="display:none">
+  <div class="card">
+    <div class="card-title">Dream11 Scoring Calculator</div>
+    <p style="color:#64748b;font-size:13px;margin-bottom:18px">Enter a player's actual performance stats to compute exact Dream11 fantasy points.</p>
+    <div class="grid3" style="gap:12px;margin-bottom:14px">
+      <div><label>Runs Scored</label><input type="number" id="sc_runs" value="45" min="0" max="300" oninput="calcScore()" /></div>
+      <div><label>Balls Faced</label><input type="number" id="sc_balls" value="32" min="0" oninput="calcScore()" /></div>
+      <div><label>Fours</label><input type="number" id="sc_4s" value="4" min="0" oninput="calcScore()" /></div>
+      <div><label>Sixes</label><input type="number" id="sc_6s" value="2" min="0" oninput="calcScore()" /></div>
+      <div><label>Dismissed?</label>
+        <select id="sc_out" onchange="calcScore()"><option value="1">Yes</option><option value="0">No</option></select>
+      </div>
+      <div><label>Duck?</label>
+        <select id="sc_duck" onchange="calcScore()"><option value="0">No</option><option value="1">Yes</option></select>
+      </div>
+    </div>
+    <div class="sep" style="margin:10px 0 14px"></div>
+    <div class="grid3" style="gap:12px;margin-bottom:14px">
+      <div><label>Wickets</label><input type="number" id="sc_wkt" value="2" min="0" max="10" oninput="calcScore()" /></div>
+      <div><label>Overs Bowled</label><input type="number" id="sc_ovr" value="4" step="0.1" min="0" oninput="calcScore()" /></div>
+      <div><label>Runs Conceded</label><input type="number" id="sc_rc" value="28" min="0" oninput="calcScore()" /></div>
+      <div><label>Maidens</label><input type="number" id="sc_mai" value="1" min="0" oninput="calcScore()" /></div>
+    </div>
+    <div class="sep" style="margin:10px 0 14px"></div>
+    <div class="grid3" style="gap:12px">
+      <div><label>Catches</label><input type="number" id="sc_cat" value="1" min="0" oninput="calcScore()" /></div>
+      <div><label>Stumpings</label><input type="number" id="sc_stu" value="0" min="0" oninput="calcScore()" /></div>
+      <div><label>Direct Run Outs</label><input type="number" id="sc_ro" value="0" min="0" oninput="calcScore()" /></div>
+    </div>
+  </div>
+
+  <div class="card spacer" id="scoreOutput">
+    <div class="card-title">Point Breakdown</div>
+    <div id="scoreBreakdown"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ARCH TAB ════════════════════════════ -->
+<div id="tab-arch" style="display:none">
+  <div class="card">
+    <div class="card-title">System Architecture</div>
+    <div class="arch">
+      <div class="arch-row">
+        <div class="arch-box" style="background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.35);color:#93c5fd">
+          🖥 React Frontend (GitHub Pages)
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.35);color:#6ee7b7">
+          ⚡ FastAPI Backend (Python)
+        </div>
+      </div>
+      <div style="margin-left:20px;color:#475569;font-size:18px">↓</div>
+      <div class="arch-row">
+        <div class="arch-box" style="background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.3);color:#c4b5fd;font-size:12px">🤖 ML Model<br><span style="font-weight:400;color:#7c3aed">GradientBoosting<br>FeatureEngineering</span></div>
+        <div class="arch-arrow">+</div>
+        <div class="arch-box" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:#fcd34d;font-size:12px">🎲 Monte Carlo Sim<br><span style="font-weight:400;color:#b45309">5 Scenarios<br>100–2000 runs</span></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#fca5a5;font-size:12px">🏏 Dream11 Scorer<br><span style="font-weight:400;color:#b91c1c">Bat+Bowl+Field<br>Strict D11 rules</span></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box" style="background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:#6ee7b7;font-size:12px">📊 Backtest Engine<br><span style="font-weight:400;color:#065f46">MAE/RMSE<br>Weight correction</span></div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="card-title">Module Responsibilities</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+      <div id="mod1"></div><div id="mod2"></div><div id="mod3"></div><div id="mod4"></div>
+    </div>
+  </div>
+  <div class="card spacer">
+    <div class="card-title">Dream11 Scoring Rules Reference</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px" id="rulesGrid"></div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════ CONSTANTS ══════════════════════════════════
+
+const ROLE_ICONS = {bat:"🏏",bowl:"⚡",allround:"🔄",wk:"🧤"};
+const RISK_COLOR = {Low:"#22c55e",Medium:"#f59e0b",High:"#ef4444"};
+const SC_CONFIG = [
+  {id:"batting_collapse",label:"Batting Collapse",icon:"📉",color:"#ef4444",
+   bat_mult:[0.45,0.75],wkt_mult:[1.5,2.5],top_pen:0.4},
+  {id:"strong_batting",label:"Strong Batting",icon:"📈",color:"#22c55e",
+   bat_mult:[1.3,1.8],wkt_mult:[0.3,0.6],top_pen:0},
+  {id:"balanced",label:"Balanced",icon:"⚖️",color:"#3b82f6",
+   bat_mult:[0.85,1.15],wkt_mult:[0.8,1.2],top_pen:0},
+  {id:"bowling_dominance",label:"Bowling Dom.",icon:"🎯",color:"#a855f7",
+   bat_mult:[0.3,0.6],wkt_mult:[1.8,3.0],top_pen:0},
+  {id:"ideal_fantasy",label:"Ideal Fantasy",icon:"⭐",color:"#f59e0b",
+   bat_mult:[1.1,1.5],wkt_mult:[1.2,1.8],top_pen:0},
+];
+
+const PLAYER_DB = {
+  India:{
+    "Rohit Sharma":{role:"bat",order:1,avg:42,sr:138,form:45,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Shubman Gill":{role:"bat",order:2,avg:35,sr:142,form:38,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Virat Kohli":{role:"bat",order:3,avg:52,sr:137,form:55,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Suryakumar Yadav":{role:"bat",order:4,avg:46,sr:166,form:50,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Hardik Pandya":{role:"allround",order:5,avg:28,sr:145,form:30,wpm:1.2,eco:8.5,ovr:3.0,btype:"pace"},
+    "Rishabh Pant":{role:"wk",order:6,avg:35,sr:148,form:38,wpm:0,eco:0,ovr:0,btype:"pace",stump:0.3},
+    "Ravindra Jadeja":{role:"allround",order:7,avg:20,sr:130,form:18,wpm:1.1,eco:7.2,ovr:3.5,btype:"spin"},
+    "Axar Patel":{role:"bowl",order:8,avg:18,sr:140,form:20,wpm:1.3,eco:7.0,ovr:3.5,btype:"spin"},
+    "Jasprit Bumrah":{role:"bowl",order:9,avg:4,sr:80,form:3,wpm:1.8,eco:6.5,ovr:3.8,btype:"pace"},
+    "Mohammed Siraj":{role:"bowl",order:10,avg:3,sr:60,form:2,wpm:1.3,eco:8.2,ovr:3.5,btype:"pace"},
+    "Kuldeep Yadav":{role:"bowl",order:11,avg:5,sr:70,form:3,wpm:1.5,eco:7.8,ovr:3.5,btype:"spin"},
+  },
+  Australia:{
+    "David Warner":{role:"bat",order:1,avg:38,sr:143,form:40,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Travis Head":{role:"bat",order:2,avg:35,sr:155,form:45,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Steve Smith":{role:"bat",order:3,avg:30,sr:120,form:28,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Glenn Maxwell":{role:"allround",order:4,avg:33,sr:158,form:35,wpm:0.7,eco:8.5,ovr:2.0,btype:"spin"},
+    "Tim David":{role:"bat",order:5,avg:40,sr:162,form:42,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Mitchell Marsh":{role:"allround",order:6,avg:30,sr:148,form:32,wpm:0.8,eco:9.0,ovr:2.0,btype:"pace"},
+    "Matthew Wade":{role:"wk",order:7,avg:22,sr:138,form:20,wpm:0,eco:0,ovr:0,btype:"pace",stump:0.25},
+    "Pat Cummins":{role:"bowl",order:8,avg:12,sr:120,form:10,wpm:1.4,eco:8.0,ovr:3.8,btype:"pace"},
+    "Mitchell Starc":{role:"bowl",order:9,avg:6,sr:85,form:4,wpm:1.3,eco:8.5,ovr:3.8,btype:"pace"},
+    "Josh Hazlewood":{role:"bowl",order:10,avg:3,sr:60,form:2,wpm:1.4,eco:7.8,ovr:3.8,btype:"pace"},
+    "Adam Zampa":{role:"bowl",order:11,avg:5,sr:75,form:3,wpm:1.6,eco:7.5,ovr:3.8,btype:"spin"},
+  },
+  England:{
+    "Jos Buttler":{role:"wk",order:1,avg:38,sr:148,form:40,wpm:0,eco:0,ovr:0,btype:"pace",stump:0.30},
+    "Phil Salt":{role:"bat",order:2,avg:36,sr:155,form:38,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Jonny Bairstow":{role:"bat",order:3,avg:30,sr:140,form:28,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Liam Livingstone":{role:"allround",order:4,avg:32,sr:155,form:30,wpm:0.6,eco:8.0,ovr:1.5,btype:"spin"},
+    "Jofra Archer":{role:"bowl",order:9,avg:8,sr:100,form:5,wpm:1.5,eco:7.8,ovr:3.8,btype:"pace"},
+    "Adil Rashid":{role:"bowl",order:10,avg:5,sr:80,form:4,wpm:1.4,eco:7.5,ovr:3.8,btype:"spin"},
+  },
+  Pakistan:{
+    "Babar Azam":{role:"bat",order:1,avg:48,sr:130,form:45,wpm:0,eco:0,ovr:0,btype:"pace"},
+    "Mohammad Rizwan":{role:"wk",order:2,avg:45,sr:128,form:48,wpm:0,eco:0,ovr:0,btype:"pace",stump:0.30},
+    "Shaheen Afridi":{role:"bowl",order:10,avg:5,sr:70,form:3,wpm:1.6,eco:7.5,ovr:3.8,btype:"pace"},
+    "Shadab Khan":{role:"allround",order:7,avg:18,sr:130,form:15,wpm:1.3,eco:7.8,ovr:3.5,btype:"spin"},
+  }
+};
+
+const VENUE_MOD = {
+  "Wankhede Stadium":1.15,"Chinnaswamy Stadium":1.25,"Eden Gardens":1.0,
+  "MA Chidambaram Stadium":0.88,"Narendra Modi Stadium":1.05,"MCG":1.05,"Lords":1.0
+};
+const PITCH_BAT = {balanced:1.0,batting_friendly:1.2,spin_friendly:0.85,pace_friendly:0.90};
+const PITCH_BOWL = {balanced:1.0,batting_friendly:0.75,spin_friendly:1.2,pace_friendly:1.15};
+
+// ══════════════════════════════════ STATE ══════════════════════════════════
+
+let players = [];
+let activeScenarios = [];
+let predResult = null;
+let barChart = null, radarChart = null;
+
+// ══════════════════════════════════ INIT ══════════════════════════════════
+
+(function init(){
+  // Scenario chips
+  const c = document.getElementById("scenarioChips");
+  SC_CONFIG.forEach(sc => {
+    const el = document.createElement("div");
+    el.className = "chip";
+    el.id = "chip_"+sc.id;
+    el.textContent = sc.icon+" "+sc.label;
+    el.style.cssText = `border-color:${sc.color}44;color:${sc.color}88;background:transparent`;
+    el.onclick = () => toggleScenario(sc.id, el, sc.color);
+    c.appendChild(el);
+  });
+
+  // Quick-fill buttons
+  const q = document.getElementById("quickFillBtns");
+  ["India","Australia","England","Pakistan"].forEach(team => {
+    const btn = document.createElement("button");
+    btn.className = "btn btn-sm btn-ghost";
+    btn.textContent = "⚡ "+team+" XI";
+    btn.onclick = () => quickFill(team);
+    q.appendChild(btn);
+  });
+
+  // Architecture modules
+  renderArchitecture();
+  renderRules();
+  calcScore();
+})();
+
+function toggleScenario(id, el, color){
+  if(activeScenarios.includes(id)){
+    activeScenarios = activeScenarios.filter(s=>s!==id);
+    el.style.cssText = `border-color:${color}44;color:${color}88;background:transparent`;
+  } else {
+    activeScenarios.push(id);
+    el.style.cssText = `border-color:${color};color:${color};background:${color}22`;
+  }
+}
+
+function syncBatFirst(){
+  const a = document.getElementById("teamA").value;
+  const b = document.getElementById("teamB").value;
+  const bf = document.getElementById("battingFirst");
+  bf.innerHTML = `<option>${a}</option><option>${b}</option>`;
+}
+
+// ══════════════════════════════════ PLAYER MGMT ══════════════════════════════
+
+function addPlayer(){
+  const name = document.getElementById("addName").value.trim();
+  if(!name) return;
+  const team = document.getElementById("addTeam").value;
+  const role = document.getElementById("addRole").value;
+  const order = parseInt(document.getElementById("addOrder").value)||1;
+  if(players.find(p=>p.name===name)) return;
+  players.push({name,team,role,batting_order:order});
+  document.getElementById("addName").value = "";
+  document.getElementById("addOrder").value = Math.min(11, order+1);
+  renderTags();
+}
+
+function quickFill(team){
+  const teamData = PLAYER_DB[team];
+  if(!teamData) return;
+  Object.entries(teamData).forEach(([name,data])=>{
+    if(!players.find(p=>p.name===name)){
+      players.push({name,team,role:data.role,batting_order:data.order});
+    }
+  });
+  renderTags();
+}
+
+function clearPlayers(){
+  players = [];
+  renderTags();
+}
+
+function removePlayer(i){
+  players.splice(i,1);
+  renderTags();
+}
+
+function renderTags(){
+  const el = document.getElementById("playerTags");
+  document.getElementById("playerCount").textContent = `(${players.length} added)`;
+  if(players.length===0){
+    el.innerHTML = '<span style="color:#475569;font-size:12px">No players added yet</span>';
+    return;
+  }
+  el.innerHTML = players.map((p,i)=>`
+    <div class="ptag">
+      <span class="role-icon">${ROLE_ICONS[p.role]||"🏏"}</span>
+      <span style="color:#e2e8f0;font-weight:600">${p.name}</span>
+      <span style="color:#475569">(${p.team})</span>
+      <span class="del" onclick="removePlayer(${i})">×</span>
+    </div>
+  `).join("");
+}
+
+// ══════════════════════════════════ DREAM11 SCORER ══════════════════════════
+
+function dream11Score(bat, bowl, field){
+  const pts = {playing_xi:4};
+  // Batting
+  pts.runs = bat.runs * 1;
+  pts.fours = bat.fours * 1;
+  pts.sixes = bat.sixes * 2;
+  pts.milestone = bat.runs>=100?16:bat.runs>=50?8:0;
+  pts.duck = (bat.duck && bat.is_out) ? -2 : 0;
+  const sr = bat.balls>0 ? (bat.runs/bat.balls)*100 : 0;
+  if(bat.balls>=10){
+    pts.sr_bonus = sr>=170?6:sr>=150?4:sr>=130?2:sr<50?-6:sr<60?-4:sr<70?-2:0;
+  } else { pts.sr_bonus = 0; }
+
+  // Bowling
+  pts.wickets = bowl.wickets * 25;
+  pts.w_milestone = bowl.wickets>=5?16:bowl.wickets>=4?8:bowl.wickets>=3?4:0;
+  pts.maidens = bowl.maidens * 12;
+  const eco = bowl.overs>0 ? bowl.rc/bowl.overs : 0;
+  if(bowl.overs>=2){
+    pts.eco_bonus = eco<5?6:eco<6?4:eco<7?2:eco<11?0:eco<12?-2:eco<13?-4:-6;
+  } else { pts.eco_bonus = 0; }
+
+  // Fielding
+  pts.catches = field.catches * 8;
+  pts.catch_bonus = field.catches>=3 ? 4 : 0;
+  pts.stumpings = field.stumpings * 12;
+  pts.ro_direct = field.ro_direct * 12;
+  pts.ro_indirect = field.ro_indirect * 6;
+
+  const total = Object.values(pts).reduce((a,b)=>a+b,0);
+  return {total:Math.round(total*10)/10, breakdown:pts};
+}
+
+function calcScore(){
+  const runs = +document.getElementById("sc_runs").value||0;
+  const balls = +document.getElementById("sc_balls").value||0;
+  const f4 = +document.getElementById("sc_4s").value||0;
+  const f6 = +document.getElementById("sc_6s").value||0;
+  const out = document.getElementById("sc_out").value==="1";
+  const duck = document.getElementById("sc_duck").value==="1";
+  const wkt = +document.getElementById("sc_wkt").value||0;
+  const ovr = +document.getElementById("sc_ovr").value||0;
+  const rc = +document.getElementById("sc_rc").value||0;
+  const mai = +document.getElementById("sc_mai").value||0;
+  const cat = +document.getElementById("sc_cat").value||0;
+  const stu = +document.getElementById("sc_stu").value||0;
+  const ro = +document.getElementById("sc_ro").value||0;
+
+  const res = dream11Score(
+    {runs,balls,fours:f4,sixes:f6,is_out:out,duck},
+    {wickets:wkt,overs:ovr,rc,maidens:mai},
+    {catches:cat,stumpings:stu,ro_direct:ro,ro_indirect:0}
+  );
+
+  const labels = {
+    playing_xi:"Playing XI",runs:"Runs",fours:"Boundaries (4s)",sixes:"Sixes",
+    milestone:"Milestone (50/100)",duck:"Duck penalty",sr_bonus:"Strike Rate bonus/penalty",
+    wickets:"Wickets",w_milestone:"Wicket milestone (3W/4W/5W)",maidens:"Maidens",
+    eco_bonus:"Economy bonus/penalty",catches:"Catches",catch_bonus:"3+ Catches bonus",
+    stumpings:"Stumpings",ro_direct:"Direct Run Outs",ro_indirect:"Indirect Run Outs"
+  };
+
+  const positive = Object.entries(res.breakdown).filter(([_,v])=>v>0);
+  const negative = Object.entries(res.breakdown).filter(([_,v])=>v<0);
+
+  document.getElementById("scoreBreakdown").innerHTML = `
+    <div style="font-size:28px;font-weight:800;color:${res.total>60?"#22c55e":res.total>30?"#f59e0b":"#94a3b8"};margin-bottom:16px">
+      ${res.total} Fantasy Points
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:11px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Positive Points</div>
+        ${positive.map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+            <span style="color:#94a3b8">${labels[k]||k}</span>
+            <span style="color:#22c55e;font-weight:700">+${v}</span>
+          </div>`).join("")}
+      </div>
+      <div>
+        <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Penalties</div>
+        ${negative.length===0?'<span style="color:#475569;font-size:13px">No penalties</span>':
+          negative.map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+            <span style="color:#94a3b8">${labels[k]||k}</span>
+            <span style="color:#ef4444;font-weight:700">${v}</span>
+          </div>`).join("")}
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════ MONTE CARLO CORE ════════════════════════
+
+function rand(lo,hi){ return lo + Math.random()*(hi-lo); }
+function poissonSample(lambda){
+  if(lambda<=0) return 0;
+  const L = Math.exp(-lambda);
+  let k=0, p=1;
+  do { k++; p*=Math.random(); } while(p>L);
+  return k-1;
+}
+
+function getStats(p){
+  const db = PLAYER_DB[p.team]?.[p.name];
+  if(db) return db;
+  const defaults = {bat:{avg:25,sr:125,form:22,wpm:0,eco:0,ovr:0,btype:"pace"},
+    bowl:{avg:8,sr:90,form:5,wpm:1.2,eco:7.8,ovr:3.5,btype:"pace"},
+    allround:{avg:20,sr:128,form:18,wpm:1.0,eco:7.5,ovr:3.0,btype:"pace"},
+    wk:{avg:25,sr:132,form:22,wpm:0,eco:0,ovr:0,btype:"pace",stump:0.25}};
+  return defaults[p.role]||defaults.bat;
+}
+
+function simulatePlayer(p, sc, nSim, context){
+  const stats = getStats(p);
+  const pitchBat = PITCH_BAT[context.pitch]||1.0;
+  const pitchBowl = PITCH_BOWL[context.pitch]||1.0;
+  const venueMod = VENUE_MOD[context.venue]||1.0;
+  const dewMod = (context.weather==="dew" && p.team!==context.battingFirst) ? 1.1 : 1.0;
+  const isSpinner = stats.btype==="spin";
+  const spinBonus = (isSpinner && context.pitch==="spin_friendly") ? 1.2 : 1.0;
+
+  const pointsList = [];
+  for(let i=0;i<nSim;i++){
+    const globalNoise = 0.85+Math.random()*0.30;
+
+    // Batting
+    let runMult = rand(...sc.bat_mult) * pitchBat * venueMod * dewMod;
+    if(p.batting_order<=4 && sc.top_pen>0) runMult *= (1-sc.top_pen*Math.random());
+    const formWeight = 0.4;
+    const baseRuns = stats.form*formWeight + stats.avg*(1-formWeight);
+    const simRuns = Math.max(0, poissonSample(baseRuns*runMult*globalNoise));
+    const simBalls = Math.max(1, Math.round(simRuns/(stats.sr/100+0.01) * rand(0.85,1.15)));
+    const out = Math.random()<0.88;
+    const duck = simRuns===0 && out && Math.random()<0.05;
+    const simFours = Math.min(Math.floor(simRuns/4), poissonSample(simRuns*0.07));
+    const simSixes = Math.min(Math.floor(simRuns/6), poissonSample(simRuns*0.02));
+
+    // Bowling
+    let simWkt=0, simOvr=0, simRC=0, simMai=0;
+    if(stats.ovr>0){
+      const wktMult = rand(...sc.wkt_mult)*pitchBowl*spinBonus;
+      const econMult = rand(0.85,1.15);
+      simWkt = Math.min(10, poissonSample(Math.max(0.1,stats.wpm*wktMult)));
+      simOvr = Math.max(0.1, stats.ovr + (Math.random()-0.5)*0.8);
+      simRC = Math.max(0, Math.round(stats.eco*econMult*simOvr));
+      simMai = poissonSample(stats.ovr>3?0.3:0.1);
+    }
+
+    // Fielding
+    const catchProb = p.role==="wk"?0.25:0.12;
+    const simCatch = poissonSample(catchProb);
+    const simStump = p.role==="wk"? poissonSample(stats.stump||0.25): 0;
+    const simRO = Math.random()<0.05?1:0;
+
+    const scored = dream11Score(
+      {runs:simRuns,balls:simBalls,fours:simFours,sixes:simSixes,is_out:out,duck},
+      {wickets:simWkt,overs:simOvr,rc:simRC,maidens:simMai},
+      {catches:simCatch,stumpings:simStump,ro_direct:simRO,ro_indirect:0}
+    );
+    pointsList.push(scored.total);
+  }
+  return pointsList;
+}
+
+function aggregatePoints(list){
+  const n = list.length;
+  const avg = list.reduce((a,b)=>a+b,0)/n;
+  const std = Math.sqrt(list.reduce((a,b)=>a+(b-avg)**2,0)/n);
+  return {
+    avg:Math.round(avg*10)/10,
+    max:Math.round(Math.max(...list)*10)/10,
+    min:Math.round(Math.min(...list)*10)/10,
+    std:Math.round(std*10)/10,
+    list
+  };
+}
+
+// ══════════════════════════════════ PREDICTION RUN ══════════════════════════
+
+function runPrediction(){
+  if(players.length<2){
+    showError("Add at least 2 players before running prediction.");
+    return;
+  }
+  const btn = document.getElementById("runBtn");
+  const status = document.getElementById("runStatus");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Running Simulations…';
+  status.textContent = "";
+  document.getElementById("errorBox").style.display="none";
+  document.getElementById("results").style.display="none";
+
+  const nSim = parseInt(document.getElementById("nSim").value)||500;
+  const pitch = document.getElementById("pitchType").value;
+  const weather = document.getElementById("weather").value;
+  const venue = document.getElementById("venue").value;
+  const battingFirst = document.getElementById("battingFirst").value;
+  const context = {pitch, weather, venue, battingFirst};
+
+  const scenarios = activeScenarios.length>0 
+    ? SC_CONFIG.filter(s=>activeScenarios.includes(s.id))
+    : SC_CONFIG;
+
+  // Run in next tick to allow spinner to render
+  setTimeout(()=>{
+    try {
+      const allResults = players.map(p=>{
+        const perScenario = {};
+        scenarios.forEach(sc=>{
+          const pts = simulatePlayer(p, sc, nSim, context);
+          perScenario[sc.id] = aggregatePoints(pts);
+        });
+        const balanced = perScenario["balanced"] || Object.values(perScenario)[0];
+        const allAvg = Object.values(perScenario).map(r=>r.avg);
+        const allMax = Object.values(perScenario).map(r=>r.max);
+        const allMin = Object.values(perScenario).map(r=>r.min);
+        const std = balanced.std;
+        const avgPts = balanced.avg;
+        const risk = std<8?"Low":std<18?"Medium":"High";
+        const consistency = Math.max(0,Math.min(100,100-std/(avgPts+0.01)*100));
+        const confidence = Math.max(0,Math.min(100,100-std/(avgPts+0.01)*50));
+        return {
+          player:p.name, team:p.team, role:p.role,
+          predicted_points:avgPts,
+          max_possible:Math.max(...allMax),
+          min_possible:Math.min(...allMin),
+          risk_factor:risk,
+          consistency_score:Math.round(consistency*10)/10,
+          confidence_pct:Math.round(confidence*10)/10,
+          scenario_breakdown:Object.fromEntries(
+            Object.entries(perScenario).map(([id,r])=>{
+              const sc = SC_CONFIG.find(s=>s.id===id);
+              return [id,{avg:r.avg,max:r.max,min:r.min,risk:r.std<8?"Low":r.std<18?"Medium":"High",color:sc?.color||"#888"}];
+            })
+          )
+        };
+      });
+
+      allResults.sort((a,b)=>b.predicted_points-a.predicted_points);
+
+      // Captain/VC: highest score*0.7 + consistency*0.3
+      const scored = [...allResults].sort((a,b)=>(b.predicted_points*0.7+b.consistency_score*0.3)-(a.predicted_points*0.7+a.consistency_score*0.3));
+      const captain = scored[0]?.player||"";
+      const vc = scored[1]?.player||"";
+
+      predResult = {players:allResults, captain, vc, nSim, context};
+      renderResults(predResult);
+    } catch(e){
+      showError("Simulation error: "+e.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = "🚀 Run Prediction Engine";
+      status.textContent = `Last run: ${nSim} simulations × ${scenarios.length} scenarios`;
+    }
+  },50);
+}
+
+function showError(msg){
+  const el = document.getElementById("errorBox");
+  el.textContent = "⚠️ "+msg;
+  el.style.display="block";
+}
+
+// ══════════════════════════════════ RENDER RESULTS ══════════════════════════
+
+function renderResults(res){
+  document.getElementById("results").style.display="block";
+  const maxPts = Math.max(...res.players.map(p=>p.predicted_points));
+
+  // Stat cards
+  document.getElementById("statCards").innerHTML = [
+    {label:"Players Analysed",val:res.players.length,color:"var(--accent)"},
+    {label:"Simulations Run",val:res.nSim.toLocaleString(),color:"var(--accent2)"},
+    {label:"Scenarios Active",val:SC_CONFIG.filter(s=>res.players[0]?.scenario_breakdown?.[s.id]).length,color:"var(--violet)"},
+    {label:"Top Predicted Score",val:maxPts,color:"var(--gold)"},
+  ].map(s=>`<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-val" style="color:${s.color}">${s.val}</div></div>`).join("");
+
+  // Captain banner
+  document.getElementById("captainBanner").innerHTML = `
+    <div>
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">👑 Recommended Captain</div>
+      <div style="font-size:20px;font-weight:800;color:${RISK_COLOR["Low"]}">${res.captain}</div>
+      <div style="font-size:12px;color:#64748b">2× points</div>
+    </div>
+    <div style="width:1px;background:var(--border)"></div>
+    <div>
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">🥈 Vice Captain</div>
+      <div style="font-size:20px;font-weight:800;color:var(--violet)">${res.vc}</div>
+      <div style="font-size:12px;color:#64748b">1.5× points</div>
+    </div>
+    <div style="width:1px;background:var(--border)"></div>
+    <div style="flex:1">
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Match Context</div>
+      <div style="font-size:13px;color:#cbd5e1">${res.context.venue} · <span style="text-transform:capitalize">${res.context.pitch.replace("_"," ")}</span> · ${res.context.weather}</div>
+      <div style="font-size:12px;color:#64748b">Batting first: ${res.context.battingFirst}</div>
+    </div>
+  `;
+
+  // Table
+  const tbody = document.getElementById("resultsBody");
+  tbody.innerHTML = "";
+  res.players.forEach((p,i)=>{
+    const isCap = p.player===res.captain;
+    const isVC = p.player===res.vc;
+    const tr = document.createElement("tr");
+    tr.className = isCap?"is-captain":isVC?"is-vc":"";
+    tr.style.cursor="pointer";
+
+    const riskCol = RISK_COLOR[p.risk_factor]||"#94a3b8";
+    const confWidth = p.confidence_pct;
+    const conWidth = p.consistency_score;
+    const barWidth = Math.round((p.predicted_points/maxPts)*100);
+
+    tr.innerHTML = `
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">${ROLE_ICONS[p.role]||"🏏"}</span>
+          <div>
+            <div style="font-weight:700;color:#e2e8f0;font-size:13px;display:flex;align-items:center;gap:6px">
+              ${p.player}
+              ${isCap?`<span class="badge" style="background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.3)">C</span>`:""}
+              ${isVC?`<span class="badge" style="background:rgba(168,85,247,.15);color:#a855f7;border-color:rgba(168,85,247,.3)">VC</span>`:""}
+            </div>
+            <div style="font-size:11px;color:#475569">${p.team}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="color:#10b981;font-weight:800;font-size:15px">${p.predicted_points}</span>
+          <div class="bar-track" style="width:60px">
+            <div class="bar-fill" style="width:${barWidth}%;background:#10b981"></div>
+          </div>
+        </div>
+      </td>
+      <td style="color:#64748b;font-size:13px">${p.max_possible}</td>
+      <td style="color:#64748b;font-size:13px">${p.min_possible}</td>
+      <td><span class="badge" style="background:${riskCol}18;color:${riskCol};border-color:${riskCol}33">${p.risk_factor}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+          <span style="color:#94a3b8">${p.confidence_pct}%</span>
+          <div class="bar-track" style="width:60px"><div class="bar-fill" style="width:${confWidth}%;background:var(--accent2)"></div></div>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+          <span style="color:#94a3b8">${p.consistency_score}</span>
+          <div class="bar-track" style="width:60px"><div class="bar-fill" style="width:${conWidth}%;background:var(--violet)"></div></div>
+        </div>
+      </td>
+      <td style="color:#475569;font-size:14px" id="arrow_${i}">▼</td>
+    `;
+
+    // Expand row
+    const expandTr = document.createElement("tr");
+    expandTr.className = "expand-row";
+    expandTr.id = "expand_"+i;
+    expandTr.style.display="none";
+    const scenarios = Object.entries(p.scenario_breakdown||{});
+    expandTr.innerHTML = `<td colspan="8" style="padding:8px 16px 12px">
+      <div class="sc-grid">
+        ${scenarios.map(([id,data])=>{
+          const sc = SC_CONFIG.find(s=>s.id===id)||{color:"#888",label:id,icon:""};
+          const rcolor = RISK_COLOR[data.risk]||"#94a3b8";
+          return `<div class="sc-box" style="background:${sc.color}12;border:1px solid ${sc.color}33">
+            <div class="sc-name" style="color:${sc.color}">${sc.icon||""} ${(sc.label||id)}</div>
+            <div class="sc-row">Avg: <b>${data.avg}</b></div>
+            <div class="sc-row">Max: ${data.max} · Min: ${data.min}</div>
+            <div class="sc-row"><span class="badge" style="background:${rcolor}18;color:${rcolor};border-color:${rcolor}33">${data.risk}</span></div>
+          </div>`;
+        }).join("")}
+      </div>
+    </td>`;
+
+    tr.onclick = ()=>{
+      const ex = document.getElementById("expand_"+i);
+      const ar = document.getElementById("arrow_"+i);
+      const open = ex.style.display==="table-row";
+      ex.style.display = open?"none":"table-row";
+      ar.textContent = open?"▼":"▲";
+    };
+
+    tbody.appendChild(tr);
+    tbody.appendChild(expandTr);
+  });
+
+  // Charts
+  renderBarChart(res.players);
+  renderRadarChart(res.players.slice(0,5));
+  setTimeout(()=>window.scrollTo({top:document.getElementById("results").offsetTop-20,behavior:"smooth"}),100);
+}
+
+function renderBarChart(players){
+  if(barChart){ barChart.destroy(); }
+  const top = players.slice(0,12);
+  const ctx = document.getElementById("barChart").getContext("2d");
+  barChart = new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels:top.map(p=>p.player.split(" ").pop()),
+      datasets:[
+        {label:"Predicted",data:top.map(p=>p.predicted_points),backgroundColor:"rgba(16,185,129,0.7)",borderRadius:5},
+        {label:"Max",data:top.map(p=>p.max_possible),backgroundColor:"rgba(59,130,246,0.35)",borderRadius:5},
+        {label:"Min",data:top.map(p=>p.min_possible),backgroundColor:"rgba(239,68,68,0.25)",borderRadius:5},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,labels:{color:"#94a3b8",font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:"#64748b",font:{size:10}},grid:{color:"rgba(255,255,255,0.04)"}},
+        y:{ticks:{color:"#64748b",font:{size:11}},grid:{color:"rgba(255,255,255,0.04)"}}
+      }
+    }
+  });
+}
+
+function renderRadarChart(players){
+  if(radarChart){ radarChart.destroy(); }
+  const scenarios = SC_CONFIG.map(s=>s.label.replace(" Dom.",""));
+  const ctx = document.getElementById("radarChart").getContext("2d");
+  const colors = ["#10b981","#3b82f6","#f59e0b","#a855f7","#ef4444"];
+  radarChart = new Chart(ctx,{
+    type:"radar",
+    data:{
+      labels:scenarios,
+      datasets:players.map((p,i)=>({
+        label:p.player.split(" ").pop(),
+        data:SC_CONFIG.map(sc=>p.scenario_breakdown?.[sc.id]?.avg||0),
+        borderColor:colors[i%5],backgroundColor:colors[i%5]+"22",
+        borderWidth:2,pointRadius:3
+      }))
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:"#94a3b8",font:{size:10}}}},
+      scales:{r:{ticks:{color:"#64748b",font:{size:9}},grid:{color:"rgba(255,255,255,0.07)"},pointLabels:{color:"#94a3b8",font:{size:10}}}}
+    }
+  });
+}
+
+// ══════════════════════════════════ BACKTEST ════════════════════════════════
+
+function runBacktest(){
+  const btn = document.getElementById("btBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Running…';
+
+  setTimeout(()=>{
+    const matches = generateSampleMatches();
+    const weightStore = {};
+
+    const results = matches.map((m,idx)=>{
+      const ctx = {pitch:m.pitch,weather:"normal",venue:m.venue,battingFirst:m.batting_first};
+      const preds = {};
+      m.players.forEach(p=>{
+        const sc = SC_CONFIG.find(s=>s.id==="balanced");
+        const pts = simulatePlayer(p,sc,200,ctx);
+        preds[p.name] = aggregatePoints(pts).avg;
+      });
+
+      const errors = m.players.map(p=>{
+        const pred = preds[p.name]||0;
+        const actual = m.actual[p.name]||0;
+        const err = Math.abs(pred-actual);
+        // Update weights
+        const ratio = Math.min(3,Math.max(0.3,actual/(pred+0.01)));
+        if(!weightStore[p.name]) weightStore[p.name]={batting_mult:1.0,bowling_mult:1.0,n:0};
+        const w = weightStore[p.name];
+        w.batting_mult = 0.8*w.batting_mult + 0.2*ratio;
+        w.bowling_mult = 0.8*w.bowling_mult + 0.2*ratio;
+        w.n++;
+        return err;
+      });
+      const mae = Math.round(errors.reduce((a,b)=>a+b,0)/errors.length*10)/10;
+      const rmse = Math.round(Math.sqrt(errors.reduce((a,b)=>a+b*b,0)/errors.length)*10)/10;
+      const topPred = Object.entries(preds).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]);
+      const topAct = Object.entries(m.actual).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]);
+      const overlap = topPred.filter(n=>topAct.includes(n)).length;
+      return {id:`MATCH_${String(idx+1).padStart(3,"0")}`,mae,rmse,top5:Math.round(overlap/5*100)};
+    });
+
+    const overallMAE = Math.round(results.reduce((a,b)=>a+b.mae,0)/results.length*100)/100;
+    const overallRMSE = Math.round(results.reduce((a,b)=>a+b.rmse,0)/results.length*100)/100;
+    const avgTop5 = Math.round(results.reduce((a,b)=>a+b.top5,0)/results.length*10)/10;
+
+    // Stat cards
+    document.getElementById("btStats").innerHTML = [
+      {label:"Matches Tested",val:results.length,color:"var(--accent2)"},
+      {label:"Overall MAE (pts)",val:overallMAE,color:"var(--gold)"},
+      {label:"Overall RMSE (pts)",val:overallRMSE,color:"var(--red)"},
+      {label:"Avg Top-5 Accuracy",val:avgTop5+"%",color:"var(--accent)"},
+    ].map(s=>`<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-val" style="color:${s.color}">${s.val}</div></div>`).join("");
+
+    // Table
+    document.getElementById("btBody").innerHTML = results.map(r=>`
+      <tr>
+        <td style="font-weight:700;color:#e2e8f0">${r.id}</td>
+        <td style="color:#f59e0b">${r.mae}</td>
+        <td style="color:#ef4444">${r.rmse}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="progressbar"><div class="progressbar-fill" style="width:${r.top5}%;background:#22c55e"></div></div>
+            <span style="color:#22c55e;font-size:13px">${r.top5}%</span>
+          </div>
+        </td>
+        <td><span class="badge" style="background:${r.mae<20?"rgba(34,197,94,.12)":"rgba(245,158,11,.12)"};color:${r.mae<20?"#22c55e":"#f59e0b"};border-color:${r.mae<20?"rgba(34,197,94,.3)":"rgba(245,158,11,.3)"}">
+          ${r.mae<20?"Good":"Fair"}
+        </span></td>
+      </tr>
+    `).join("");
+
+    // Weight corrections
+    document.getElementById("weightGrid").innerHTML = Object.entries(weightStore).map(([name,w])=>{
+      const diff = Math.round((w.batting_mult-1)*100);
+      const col = diff>5?"#22c55e":diff<-5?"#ef4444":"#94a3b8";
+      return `<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;border:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;color:#e2e8f0;margin-bottom:4px">${name}</div>
+        <div style="font-size:11px;color:#64748b">Bat mult: <span style="color:${col};font-weight:700">${Math.round(w.batting_mult*100)/100}×</span></div>
+        <div style="font-size:11px;color:#64748b">Bowl mult: <span style="color:${col};font-weight:700">${Math.round(w.bowling_mult*100)/100}×</span></div>
+        <div style="font-size:10px;color:#334155;margin-top:2px">${w.n} matches</div>
+      </div>`;
+    }).join("");
+
+    document.getElementById("btResults").style.display="block";
+    btn.disabled=false;
+    btn.innerHTML="▶ Run Backtest (5 sample matches)";
+  },80);
+}
+
+function generateSampleMatches(){
+  const indPlayers = Object.entries(PLAYER_DB.India).map(([n,d])=>({name:n,team:"India",role:d.role,batting_order:d.order}));
+  const ausPlayers = Object.entries(PLAYER_DB.Australia).map(([n,d])=>({name:n,team:"Australia",role:d.role,batting_order:d.order}));
+  const configs = [
+    {pitch:"batting_friendly",venue:"Wankhede Stadium",batting_first:"India"},
+    {pitch:"spin_friendly",venue:"MA Chidambaram Stadium",batting_first:"Australia"},
+    {pitch:"balanced",venue:"Eden Gardens",batting_first:"India"},
+    {pitch:"pace_friendly",venue:"MCG",batting_first:"Australia"},
+    {pitch:"batting_friendly",venue:"Chinnaswamy Stadium",batting_first:"India"},
+  ];
+  return configs.map((c,i)=>{
+    const allPlayers = [...indPlayers,...ausPlayers];
+    const actual = {};
+    allPlayers.forEach(p=>{
+      const base = {bat:45,bowl:40,allround:55,wk:42}[p.role]||40;
+      actual[p.name] = Math.max(4, Math.round((base + (Math.random()-0.5)*40)*10)/10);
+    });
+    return {...c,players:allPlayers,actual};
+  });
+}
+
+// ══════════════════════════════════ ARCHITECTURE ═══════════════════════════
+
+function renderArchitecture(){
+  const modules = [
+    {title:"scoring_engine.py",desc:"Strict Dream11 T20 rules: batting pts, bowling pts, fielding pts, SR/economy bonuses and penalties",color:"#ef4444"},
+    {title:"simulation_engine.py",desc:"Monte Carlo core — 5 named scenarios × N simulations, each randomly varying run/wicket/field outcomes",color:"#f59e0b"},
+    {title:"ml_model.py",desc:"GradientBoosting baseline predictor using pitch, venue, weather, batting order, recent form as features",color:"#3b82f6"},
+    {title:"backtest_engine.py",desc:"Self-learning: predict → compare actual → compute MAE/RMSE → update per-player weight multipliers",color:"#22c55e"},
+  ];
+  modules.forEach((m,i)=>{
+    document.getElementById("mod"+(i+1)).innerHTML = `
+      <div style="background:${m.color}0d;border:1px solid ${m.color}2a;border-radius:12px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:${m.color};font-family:monospace;margin-bottom:6px">${m.title}</div>
+        <div style="font-size:12px;color:#64748b;line-height:1.6">${m.desc}</div>
+      </div>`;
+  });
+}
+
+function renderRules(){
+  const rules = [
+    {cat:"Batting",color:"#3b82f6",items:["Run: +1pt each","Four: +1pt extra","Six: +2pt extra","50 runs: +8pts bonus","100 runs: +16pts bonus","Duck (out for 0): −2pts"]},
+    {cat:"Strike Rate",color:"#10b981",items:["SR ≥170: +6pts","SR 150–170: +4pts","SR 130–150: +2pts","SR 60–70: −2pts","SR 50–60: −4pts","SR <50: −6pts (min 10 balls)"]},
+    {cat:"Bowling",color:"#f59e0b",items:["Wicket: +25pts","3 wickets: +4pts bonus","4 wickets: +8pts bonus","5+ wickets: +16pts bonus","Maiden over: +12pts"]},
+    {cat:"Economy Rate",color:"#a855f7",items:["ECO <5: +6pts","ECO 5–6: +4pts","ECO 6–7: +2pts","ECO 10–11: −2pts","ECO 11–12: −4pts","ECO >12: −6pts (min 2 overs)"]},
+    {cat:"Fielding",color:"#22c55e",items:["Catch: +8pts","3+ catches bonus: +4pts","Stumping: +12pts","Direct run-out: +12pts","Indirect run-out: +6pts"]},
+    {cat:"Other",color:"#64748b",items:["Playing XI: +4pts (all players)","Captain: 2× total points","Vice-Captain: 1.5× total points"]},
+  ];
+  document.getElementById("rulesGrid").innerHTML = rules.map(r=>`
+    <div style="background:${r.color}0a;border:1px solid ${r.color}22;border-radius:12px;padding:14px">
+      <div style="font-size:12px;font-weight:700;color:${r.color};margin-bottom:8px">${r.cat}</div>
+      ${r.items.map(item=>`<div style="font-size:12px;color:#64748b;padding:2px 0;display:flex;gap:6px"><span style="color:${r.color}">·</span>${item}</div>`).join("")}
+    </div>
+  `).join("");
+}
+
+// ══════════════════════════════════ TAB SWITCHER ════════════════════════════
+
+function switchTab(name, el){
+  ["predict","backtest","scorer","arch"].forEach(t=>document.getElementById("tab-"+t).style.display="none");
+  document.getElementById("tab-"+name).style.display="block";
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+}
+</script>
+</body>
+</html>
